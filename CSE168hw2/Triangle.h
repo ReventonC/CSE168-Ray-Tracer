@@ -20,6 +20,7 @@ public:
 
 	//vec getNormal(const vec p) const;
 	bool Intersect(const Ray &ray, Intersection &hit) const;
+	Vertex GetVtx(int num);
 
 private:
 	Vertex *Vtx[3];

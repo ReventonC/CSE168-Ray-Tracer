@@ -19,7 +19,7 @@ bool Triangle::Intersect(const Ray & ray, Intersection & hit) const
 	vec v3 = Vtx[2]->Position;
 
 	vec normal;
-	if (!true) {
+	if (true) {
 		vec A = v2 - v1;
 		vec B = v3 - v1;
 		vec C = glm::cross(A, B);
@@ -46,7 +46,7 @@ bool Triangle::Intersect(const Ray & ray, Intersection & hit) const
 		dot(normal, cross(e2, c2)) >= 0 &&
 		dot(normal, cross(e3, c3)) >= 0) {
 
-		if (((hit.HitDistance < 0) || (t < hit.HitDistance)) && t > 0) {
+		if (t > 0 && t < hit.HitDistance) {
 			hit.HitDistance = t - 0.00001f;
 			hit.Position = pos + hit.HitDistance * ray.Direction;
 			hit.Normal = glm::normalize(normal);
@@ -55,4 +55,13 @@ bool Triangle::Intersect(const Ray & ray, Intersection & hit) const
 		}
 	}
 	return false;
+}
+
+Vertex Triangle::GetVtx(int num)
+{
+	Vertex ret;
+	ret.Normal = Vtx[num]->Normal;
+	ret.Position = Vtx[num]->Position;
+	ret.TexCoord = Vtx[num]->TexCoord;
+	return ret;
 }

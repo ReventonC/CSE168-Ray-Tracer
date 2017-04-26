@@ -53,7 +53,7 @@ Color getColorAt(Scene &scene, Intersection &hit, Ray &ray, bool shadeStatus)
 			raySd.Direction = toLight;
 			Intersection hitSd;
 			if (scene.Intersect(raySd, hitSd)) {
-				if (hitSd.HitDistance > 0)
+				if (hitSd.HitDistance > 0 && hitSd.HitDistance < glm::length(ltPos))
 					shadowed = true;
 			}
 		}
@@ -88,7 +88,7 @@ void Camera::Render(Scene scene, bool shade)
 
 	for (auto x = 0; x < w; x++) {
 		for (auto y = 0; y < h; y++) {
-			if (x >= 27 && y >= 233 || 1) {
+			if (x == 0 && y == 203 || 1) {
 				float fx = (float(x) + 0.5f) / float(w) - 0.5f;
 				float fy = (float(y) + 0.5f) / float(h) - 0.5f;
 				Ray ray;
@@ -97,6 +97,7 @@ void Camera::Render(Scene scene, bool shade)
 
 				Intersection hit;
 				Color col;
+				
 				if (scene.Intersect(ray, hit)) {
 
 					col = getColorAt(scene, hit, ray, shade);

@@ -8,6 +8,7 @@
 #include "Light.h"
 #include <vector>
 #include <iostream>
+#define vector std::vector
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -24,7 +25,7 @@ public:
 	Color GetSkyColor()							{return SkyColor;}
 
 	bool Intersect(const Ray &ray,Intersection &hit) {
-		bool success=false;
+		/*bool success=false;
 		Intersection next;
 		for(unsigned int i=0;i<Objects.size();i++) {
 			if (Objects[i]->Intersect(ray, next)) success = true;
@@ -39,12 +40,17 @@ public:
 
 		}
 		if (hit.HitDistance > 0) return success;
-		return false;
+		return false; */
+		bool success = false;
+		for (int i = 0; i < Objects.size(); i++) {
+			if (Objects.at(i)->Intersect(ray, hit)) success = true;
+		}
+		return success;
 	}
 
 private:
-	std::vector<Object*> Objects;
-	std::vector<Light*> Lights;
+	vector<Object*> Objects;
+	vector<Light*> Lights;
 	Color SkyColor;
 };
 

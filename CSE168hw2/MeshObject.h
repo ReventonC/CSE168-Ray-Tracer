@@ -6,6 +6,9 @@
 
 #include "Object.h"
 #include "Triangle.h"
+#include <vector>
+
+#define vector std::vector
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -18,10 +21,16 @@ public:
 
 	void MakeBox(float x,float y,float z,Material *mtl=0);
 
+	bool LoadPLY(const char * filename, Material * mtl);
+
+	void Smooth();
+
+	vector<Triangle*> * GetTriangles();
+
 private:
 	int NumVertexes,NumTriangles;
-	Vertex *Vertexes;
-	Triangle *Triangles;
+	vector<Vertex*> Vertexes;
+	vector<Triangle*> Triangles;
 };
 
 ////////////////////////////////////////////////////////////////////////////////

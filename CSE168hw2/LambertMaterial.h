@@ -17,7 +17,7 @@ public:
 		float pi=3.1415926f;
 		float nDotL = glm::dot(in, hit.Normal);
 		if (nDotL < 0) nDotL = 0;
-		col = DiffuseColor * col * nDotL;
+		col = /*DiffuseColor*/ col * nDotL;
 	}
 
 private:

@@ -31,7 +31,7 @@ bool InstanceObject::Intersect(const Ray & ray, Intersection & hit)
 
 void InstanceObject::SetChild(Object & obj)
 {
-	*Child = obj;
+	Child = &obj;
 }
 
 void InstanceObject::SetMatrix(glm::mat4x4 & mtx)
