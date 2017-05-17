@@ -14,6 +14,9 @@ public:
 	void Set(float Ar, float Ag, float Ab);
 	void Set(const Color Acolor);
 	Color getColor(const Color Acolor);
+	float getr() { return r; }
+	float getg() { return g; }
+	float getb() { return b; }
 
 	Color operator+(Color col);
 	Color operator-(Color col);

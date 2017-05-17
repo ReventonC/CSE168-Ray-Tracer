@@ -18,12 +18,14 @@
 #include <ctime>
 #include <iostream>
 #include <string>
+#include "FresnelMetalMaterial.h"
 
 #define PI 3.14159265359
 
 void project1();
 void spheres();
 void project2();
+void project3();
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -33,8 +35,8 @@ int main(int argc,char **argv) {
 
 	//project1();
 	//spheres();
-
-	project2();
+	//project2();
+	project3();
 
 	std::cout << "Press ENTER to quit";
 	std::string ept;
@@ -44,106 +46,101 @@ int main(int argc,char **argv) {
 
 ////////////////////////////////////////////////////////////////////////////////
 
-void project1() {
+void project3() {
+	std::cout << "Project 3" << std::endl << std::endl;
+
 	// Create scene
 	Scene scn;
 	scn.SetSkyColor(Color(0.8f, 0.9f, 1.0f));
-
-	// Create boxes
-	MeshObject box1; 
-	box1.MakeBox(5.0f,0.1f,5.0f);
-	//scn.AddObject(box1);
-
-	BoxTreeObject tree1;
-	tree1.Construct(box1);
-	scn.AddObject(tree1);
-
-	MeshObject box2;
-	box2.MakeBox(1.0f,1.0f,1.0f);
-
-	BoxTreeObject tree2;
-	tree2.Construct(box2);
-
-	InstanceObject inst1(tree2);
-	glm::mat4x4 mtx=glm::rotate(glm::mat4x4(),0.5f,glm::vec3(1,0,0));
-	mtx[3][1]=1.0f;
-	inst1.SetMatrix(mtx); 
-	scn.AddObject(inst1);
-
-
-	// half box
-	InstanceObject inst2(tree2);
-	mtx=glm::rotate(glm::mat4x4(),1.0f,glm::vec3(0,1,0));
-	mtx[3] = glm::vec4(-1, 0, 1, 1);
-	inst2.SetMatrix(mtx);
-	scn.AddObject(inst2);
-
-	// Create lights
-	DirectLight sunlgt;
-	sunlgt.SetBaseColor(Color(1.0f, 1.0f, 0.9f));
-	sunlgt.SetIntensity(0.5f);
-	sunlgt.SetDirection(glm::vec3(-0.5f, -1.0f, -0.5f));
-	scn.AddLight(sunlgt);
-
-	PointLight redlgt;
-	redlgt.SetBaseColor(Color(1.0f, 0.2f, 0.2f));
-	redlgt.SetIntensity(2.0f);
-	redlgt.SetPosition(glm::vec3(2.0f, 2.0f, 0.0f));
-	scn.AddLight(redlgt);
-
-	// Create camera
-	Camera cam;
-	cam.LookAt(glm::vec3(2.0f,2.0f,5.0f),glm::vec3(0.0f,0.0f,0.0f),glm::vec3(0,1,0));
-	cam.SetResolution(800,600);
-	cam.SetFOV(40.0f);
-	cam.SetAspect(1.33f);
-
-	// Render image
-	cam.Render(scn, 0);
-	cam.SaveBitmap("project1.bmp");
-
-	cam.Render(scn, 1);
-	cam.SaveBitmap("project1_shade.bmp");
-}
-
-void spheres() {
-	// Create scene
-	Scene scn;
-	scn.SetSkyColor(Color(0.8f, 0.8f, 1.0f));
-
-	// Create ground plane
-	PlaneObject ground;
+	// Create ground
+	LambertMaterial groundMtl;
+	groundMtl.SetColor(Color(0.25f, 0.25f, 0.25f));
+	MeshObject ground;
+	ground.MakeBox(2.0f, 0.11f, 2.0f, &groundMtl);
 	scn.AddObject(ground);
+	// Load dragon mesh
+	MeshObject dragon;
 
-	// Create spheres
-	for (int i = 0; i<20; i++) {
-		SphereObject *sphere = new SphereObject;
-		float rad = glm::linearRand(0.25f, 0.5f);
-		vec pos(glm::linearRand(-5.0f, 5.0f), rad, glm::linearRand(-5.0f, 5.0f));
-		sphere->SetRadius(rad);
-		sphere->SetCenter(pos);
-		scn.AddObject(*sphere);
+
+	std::cout << "- LoadPLY Timer started" << std::endl << "  ";
+	std::clock_t timer = std::clock();
+
+	dragon.LoadPLY("dragon.ply", 0);
+
+
+	double timeused = (std::clock() - timer) / (double)CLOCKS_PER_SEC;
+	std::cout << "  LoadPLY Time Used: " << timeused << std::endl << std::endl;
+
+	// Create box tree
+	BoxTreeObject tree;
+
+	std::cout << "- Construct BoxTree Timer started" << std::endl;
+	timer = std::clock();
+
+	tree.Construct(dragon);
+
+
+	timeused = (std::clock() - timer) / (double)CLOCKS_PER_SEC;
+	std::cout << "  Construct BoxTree Time Used: " << timeused << std::endl << std::endl;
+
+	// Materials
+	LambertMaterial white;
+	white.SetColor(Color(0.7f, 0.7f, 0.7f));
+	LambertMaterial red;
+	red.SetColor(Color(0.7f, 0.1f, 0.1f));
+	FresnelMetalMaterial metal;
+	//LambertMaterial metal;
+	metal.SetColor(Color(0.95f, 0.64f, 0.54f));
+	const int numDragons = 4;
+	Material *mtl[numDragons] = { &white,&metal,&red,&white };
+	// Create dragon instances
+	glm::mat4x4 mtx;
+	for (int i = 0; i<numDragons; i++) {
+		InstanceObject *inst = new InstanceObject(tree);
+		mtx[3] = glm::vec4(0.0f, 0.0f, 0.3f*(float(i) / float(numDragons - 1) - 0.5f), 1.0f);
+		inst->SetMatrix(mtx);
+		inst->SetMaterial(mtl[i]);
+		scn.AddObject(*inst);
 	}
-
 	// Create lights
 	DirectLight sunlgt;
 	sunlgt.SetBaseColor(Color(1.0f, 1.0f, 0.9f));
 	sunlgt.SetIntensity(1.0f);
-	sunlgt.SetDirection(vec(2.0f, -3.0f, -2.0f));
+	sunlgt.SetDirection(glm::vec3(2.0f, -3.0f, -2.0f));
 	scn.AddLight(sunlgt);
-
 	// Create camera
 	Camera cam;
-	cam.LookAt(vec(-3.75f, 0.25f, 6.0f), vec(0.0f, 0.5f, 0.0f), vec(0, 1, 0));
-	cam.SetFOV(40.0f);
+	int w = 3000, h = 2000;
+	cam.SetResolution(w, h);
 	cam.SetAspect(1.33f);
-	cam.SetResolution(800, 600);
+	cam.LookAt(glm::vec3(-0.5f, 0.25f, -0.2f), glm::vec3(0.0f, 0.15f, 0.0f), glm::vec3(0, 1.0f, 0));
+	cam.SetFOV(40.0f);
 
+	int sx = 20, sy = 20;
+	bool jt = 1, sl = 1;
+	cam.SetSuperSample(sx,sy);
+	cam.SetJitter(jt);
+	cam.SetShirley(sl);
 	// Render image
-	cam.Render(scn, 0);
-	cam.SaveBitmap("spheres.bmp");
-	cam.Render(scn, 1);
-	cam.SaveBitmap("spheres_shade.bmp");
+	std::cout << "- Render Settings" << std::endl;
+	std::cout << "  Resolution: " << w << " x " << h << std::endl;
+	std::cout << "  SuperSample: " << sx << " x " << sy << std::endl;
+	std::string status = jt == 1 ? "On" : "Off";
+	std::cout << "  Jitter:      " << status << std::endl;
+	status = sl == 1 ? "On" : "Off";
+	std::cout << "  Shirley:     " << status << std::endl << std::endl;
+
+
+
+	std::cout << "- Render Timer started" << std::endl;
+	timer = std::clock();
+
+	cam.Render(scn);
+
+	timeused = (std::clock() - timer) / (double)CLOCKS_PER_SEC;
+	std::cout << "  Render Time Used: " << timeused << std::endl << std::endl;
+
+	cam.SaveBitmap("project3.bmp");
 }
 
 void project2() {
@@ -157,11 +154,7 @@ void project2() {
 	ground.MakeBox(5.0f, 0.1f, 5.0f);
 	scn.AddObject(ground);
 
-	/*BoxTreeObject treeg;
-	treeg.Construct(ground);
-	scn.AddObject(treeg);*/
-
-	std::cout << "LoadPLY Timer started." << std::endl;
+	std::cout << "LoadPLY Timer started." << std::endl << "  ";
 	std::clock_t timer = std::clock();
 
 	// Create dragon
@@ -215,12 +208,129 @@ void project2() {
 	cam.SetFOV(40.0f);
 	cam.SetAspect(1.33f);
 	cam.SetResolution(800, 600);
+	cam.SetSuperSample(1, 1);
+	cam.SetJitter(1);
+	cam.SetShirley(1);
+	// Render image
+	std::cout << "Render Timer started." << std::endl<< "  "; 
+	timer = std::clock();
+	cam.Render(scn);
+	timeused = (std::clock() - timer) / (double)CLOCKS_PER_SEC;
+	std::cout << "Render Time Used: " << timeused << std::endl << std::endl;
+	cam.SaveBitmap("project2.bmp");
+}
+
+void project1() {
+	// Create scene
+	Scene scn;
+	scn.SetSkyColor(Color(0.8f, 0.9f, 1.0f));
+
+	LambertMaterial groundMtl;
+	groundMtl.SetColor(Color(0.25f, 0.25f, 0.25f));
+	// Create boxes
+	MeshObject box1;
+	box1.MakeBox(5.0f, 0.1f, 5.0f, &groundMtl);
+	//scn.AddObject(box1);
+
+	BoxTreeObject tree1;
+	tree1.Construct(box1);
+	scn.AddObject(tree1);
+
+	MeshObject box2;
+	box2.MakeBox(1.0f, 1.0f, 1.0f);
+
+	BoxTreeObject tree2;
+	tree2.Construct(box2);
+
+	LambertMaterial red;
+	red.SetColor(Color(0.7f, 0.1f, 0.1f));
+	InstanceObject inst1(tree2);
+	inst1.SetMaterial(&red);
+	glm::mat4x4 mtx = glm::rotate(glm::mat4x4(), 0.5f, glm::vec3(1, 0, 0));
+	mtx[3][1] = 1.0f;
+	inst1.SetMatrix(mtx);
+	scn.AddObject(inst1);
+
+
+	// half box
+	LambertMaterial white;
+	white.SetColor(Color(0.7f, 0.7f, 0.7f));
+	InstanceObject inst2(tree2);
+	inst2.SetMaterial(&white);
+	mtx = glm::rotate(glm::mat4x4(), 1.0f, glm::vec3(0, 1, 0));
+	mtx[3] = glm::vec4(-1, 0, 1, 1);
+	inst2.SetMatrix(mtx);
+	scn.AddObject(inst2);
+
+	// Create lights
+	DirectLight sunlgt;
+	sunlgt.SetBaseColor(Color(1.0f, 1.0f, 0.9f));
+	sunlgt.SetIntensity(1.f);
+	sunlgt.SetDirection(glm::vec3(-0.5f, -1.0f, -0.5f));
+	scn.AddLight(sunlgt);
+
+	/*PointLight redlgt;
+	redlgt.SetBaseColor(Color(1.0f, 0.2f, 0.2f));
+	redlgt.SetIntensity(2.0f);
+	redlgt.SetPosition(glm::vec3(2.0f, 2.0f, 0.0f));
+	scn.AddLight(redlgt);*/
+
+	// Create camera
+	Camera cam;
+	cam.LookAt(glm::vec3(2.0f, 2.0f, 5.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0, 1, 0));
+	cam.SetResolution(800, 600);
+	cam.SetFOV(40.0f);
+	cam.SetAspect(1.33f);
+
+	cam.SetSuperSample(2,2);
+	cam.SetJitter(1);
+	cam.SetShirley(1);
 
 	// Render image
-	std::cout << "Render Timer started." << std::endl;
-	timer = std::clock();
-	cam.Render(scn, 1);
-	timeused = (std::clock() - timer) / (double)CLOCKS_PER_SEC;
-	std::cout << "Render Time Used: " << timeused << std::endl;
-	cam.SaveBitmap("project2.bmp");
+	cam.Render(scn);
+	cam.SaveBitmap("project1_shade.bmp");
+}
+
+void spheres() {
+	// Create scene
+	Scene scn;
+	scn.SetSkyColor(Color(0.8f, 0.8f, 1.0f));
+
+	// Create ground plane
+	PlaneObject ground;
+	scn.AddObject(ground);
+
+	// Create spheres
+	for (int i = 0; i<20; i++) {
+		SphereObject *sphere = new SphereObject;
+		float rad = glm::linearRand(0.25f, 0.5f);
+		vec pos(glm::linearRand(-5.0f, 5.0f), rad, glm::linearRand(-5.0f, 5.0f));
+		sphere->SetRadius(rad);
+		sphere->SetCenter(pos);
+		scn.AddObject(*sphere);
+	}
+
+	// Create lights
+	DirectLight sunlgt;
+	sunlgt.SetBaseColor(Color(1.0f, 1.0f, 0.9f));
+	sunlgt.SetIntensity(1.0f);
+	sunlgt.SetDirection(vec(2.0f, -3.0f, -2.0f));
+	scn.AddLight(sunlgt);
+
+	// Create camera
+	Camera cam;
+	cam.LookAt(vec(-3.75f, 0.25f, 6.0f), vec(0.0f, 0.5f, 0.0f), vec(0, 1, 0));
+	cam.SetFOV(40.0f);
+	cam.SetAspect(1.33f);
+	cam.SetResolution(600,480);
+
+	cam.SetSuperSample(2, 2);
+	cam.SetJitter(true);
+	cam.SetShirley(true);
+
+	// Render image
+	cam.Render(scn);
+	cam.SaveBitmap("spheres.bmp");
+	cam.Render(scn);
+	cam.SaveBitmap("spheres_shade.bmp");
 }

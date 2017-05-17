@@ -1,7 +1,12 @@
-﻿  Main.cpp
+﻿  Camera.cpp
+Camera.cpp(50): warning C4244: 'argument': conversion from 'time_t' to 'unsigned int', possible loss of data
+Camera.cpp(104): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+Camera.cpp(105): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+Camera.cpp(107): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+Camera.cpp(108): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
   Generating code
-  46 of 552 functions ( 8.3%) were compiled, the rest were copied from previous compilation.
+  46 of 647 functions ( 7.1%) were compiled, the rest were copied from previous compilation.
     0 functions were new in current compilation
-    3 functions had inline decision re-evaluated but remain unchanged
+    10 functions had inline decision re-evaluated but remain unchanged
   Finished generating code
-  CSE168hw2.vcxproj -> C:\Users\15648\OneDrive\Spring 2017\CSE 168\CSE168hw2\x64\Release\CSE168hw2.exe
+  CSE168hw2.vcxproj -> C:\Users\Luke Chen\OneDrive\Spring 2017\CSE 168\CSE168hw2\x64\Release\CSE168hw2.exe

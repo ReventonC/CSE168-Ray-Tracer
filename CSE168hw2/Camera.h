@@ -1,8 +1,11 @@
 #pragma once
 #include "Ray.h"
 #include "Scene.h"
+#include <stdlib.h>
 #include "Bitmap.h"
 #include "LambertMaterial.h"
+#include <time.h>
+#include "RayTrace.h"
 
 #define vec glm::vec3
 #define mat4 glm::mat4
@@ -19,8 +22,11 @@ public:
 	void SetResolution(int, int);
 	void SetFOV(float);
 	void SetAspect(float);
-	void Render(Scene, bool);
+	void Render(Scene);
 	void SaveBitmap(const char *filename);
+	void SetSuperSample(int, int);
+	void SetJitter(bool);
+	void SetShirley(bool);
 
 private:
 	mat4 lookAt;
@@ -29,5 +35,7 @@ private:
 	float fov;
 	float aspect;
 	Bitmap *bitMap;
+	bool EnableJitter = false, EnableShirley = false;
+	int xSamples = 1, ySamples = 1;
 };
 

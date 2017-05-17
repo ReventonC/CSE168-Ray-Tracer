@@ -34,9 +34,11 @@ void MeshObject::MakeBox(float x,float y,float z,Material *mtl) {
 	// Allocate arrays
 	NumVertexes=24;
 	NumTriangles=12;
-	if(mtl==0) mtl=new LambertMaterial;
-	Color col;
-	mtl->SetColor(col.WHITE);
+	if (mtl == 0) {
+		mtl = new LambertMaterial;
+		Color col;
+		mtl->SetColor(col.WHITE);
+	}
 	x*=0.5f;
 	y*=0.5f;
 	z*=0.5f;

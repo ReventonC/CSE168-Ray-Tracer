@@ -44,12 +44,11 @@ bool BoxTreeNode::IntersectBox(const Ray & ray, float & t)
 	float tz2 = (BoxMax.z - ray.Origin.z) / ray.Direction.z;
 	float tmin = max(min(tx1, tx2), min(ty1, ty2), min(tz1, tz2));
 	float tmax = min(max(tx1, tx2), max(ty1, ty2), max(tz1, tz2));
-	if (tmin > 0 && tmin <= tmax) {
-		t = tmin;
-		return true;
-	}
-	if (tmin < 0 && tmax > 0) {
-		t = tmax;
+	if (tmax < 0) return false;
+
+	if (tmin <= tmax) {
+		if (tmin < 0) t = 0;
+		else t = tmin;
 		return true;
 	}
 	return false;
@@ -69,7 +68,6 @@ bool BoxTreeNode::Intersect(const Ray & ray, Intersection & hit)
 	float dist1 = 1e10, dist2 = 1e10;
 	bool c1 = Child1->IntersectBox(ray, dist1);
 	bool c2 = Child2->IntersectBox(ray, dist2);
-
 	if (!c1 && !c2) {
 		return false;
 	}

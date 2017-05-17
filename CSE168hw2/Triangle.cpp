@@ -19,16 +19,10 @@ bool Triangle::Intersect(const Ray & ray, Intersection & hit) const
 	vec v3 = Vtx[2]->Position;
 
 	vec normal;
-	if (true) {
-		vec A = v2 - v1;
-		vec B = v3 - v1;
-		vec C = glm::cross(A, B);
-		normal = glm::normalize(C);
-	}
-	else
-	{
-		normal = Vtx[1]->Normal;
-	}
+	vec A = v2 - v1;
+	vec B = v3 - v1;
+	vec C = glm::cross(A, B);
+	normal = glm::normalize(C);
 
 	float D = -dot(normal, v1);
 	float t = -(dot(normal, pos) + D) / dot(normal, dir);
