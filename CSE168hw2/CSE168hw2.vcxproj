@@ -139,6 +139,7 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AshikhminMaterial.h" />
     <ClInclude Include="Bitmap.h" />
     <ClInclude Include="BoxTreeNode.h" />
     <ClInclude Include="BoxTreeObject.h" />
@@ -164,6 +165,7 @@
     <ClInclude Include="Vertex.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="AshikhminMaterial.cpp" />
     <ClCompile Include="Bitmap.cpp" />
     <ClCompile Include="BoxTreeNode.cpp" />
     <ClCompile Include="BoxTreeObject.cpp" />
